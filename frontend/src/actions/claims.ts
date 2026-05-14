@@ -90,6 +90,30 @@ export async function createClaim(formData: FormData) {
     data: { status: "CLAIMED" },
   });
 
+  // Auto-create a conversation with the proof as the first message
+  let conversation = await prisma.conversation.findUnique({
+    where: { itemId },
+  });
+
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        itemId,
+        participant1Id: item.userId,  // finder
+        participant2Id: user.id,      // claimer
+      },
+    });
+  }
+
+  // Send the claim proof as the first message
+  await prisma.message.create({
+    data: {
+      conversationId: conversation.id,
+      senderId: user.id,
+      content: `📋 **Claim submitted**\n\n${parsed.data.proofText}${imageUrls.length > 0 ? `\n\n📎 ${imageUrls.length} photo(s) attached as proof` : ""}`,
+    },
+  });
+
   // Create audit log
   await prisma.auditLog.create({
     data: {
@@ -102,5 +126,6 @@ export async function createClaim(formData: FormData) {
   });
 
   revalidatePath(`/items/${itemId}`);
-  redirect(`/items/${itemId}`);
+  revalidatePath(`/messages/${conversation.id}`);
+  redirect(`/messages/${conversation.id}`);
 }
