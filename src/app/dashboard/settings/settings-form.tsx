@@ -66,7 +66,7 @@ export function SettingsForm({ user }: SettingsFormProps) {
             Update your contact details and academic information.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form key={`${user.phone}-${user.hostel}-${user.department}`} onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="phone">Mobile Number</Label>

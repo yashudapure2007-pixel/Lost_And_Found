@@ -117,7 +117,33 @@ export async function deleteAccount() {
   if (!user) return { error: "Not authenticated" };
   if (user.role === "SUPER_ADMIN") return { error: "Super Admin cannot be deleted." };
 
-  // Hard delete all items reported by the user
+  // Get all items reported by the user
+  const userItems = await prisma.item.findMany({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+  const itemIds = userItems.map((i) => i.id);
+
+  if (itemIds.length > 0) {
+    // Delete matches related to these items
+    await prisma.match.deleteMany({
+      where: {
+        OR: [{ lostItemId: { in: itemIds } }, { foundItemId: { in: itemIds } }],
+      },
+    });
+
+    // Delete conversations related to these items
+    await prisma.conversation.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
+
+    // Delete claims on these items
+    await prisma.claim.deleteMany({
+      where: { itemId: { in: itemIds } },
+    });
+  }
+
+  // Delete all items reported by the user
   await prisma.item.deleteMany({
     where: { userId: user.id },
   });
@@ -130,6 +156,13 @@ export async function deleteAccount() {
   // Hard delete all messages sent by the user
   await prisma.message.deleteMany({
     where: { senderId: user.id },
+  });
+
+  // Delete conversations where the user is a participant
+  await prisma.conversation.deleteMany({
+    where: {
+      OR: [{ participant1Id: user.id }, { participant2Id: user.id }],
+    },
   });
 
   // Hard delete all notifications for the user
