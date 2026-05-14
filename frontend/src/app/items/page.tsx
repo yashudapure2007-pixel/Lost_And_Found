@@ -8,7 +8,6 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Search, Package } from "lucide-react";
-import { Prisma } from "@prisma/client";
 
 interface PageProps {
   searchParams: Promise<{
@@ -165,7 +164,7 @@ export default async function ItemsPage({ searchParams }: PageProps) {
                 All categories
               </Badge>
             </Link>
-            {categories.map((cat: Prisma.CategoryGetPayload<object>) => (
+            {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/items?category=${cat.id}&${new URLSearchParams({
@@ -186,7 +185,7 @@ export default async function ItemsPage({ searchParams }: PageProps) {
           {/* Items grid */}
           {items.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {items.map((item: Prisma.ItemGetPayload<{ include: { category: true; images: true } }>) => (
+              {items.map((item) => (
                 <ItemCard key={item.id} item={item} />
               ))}
             </div>
