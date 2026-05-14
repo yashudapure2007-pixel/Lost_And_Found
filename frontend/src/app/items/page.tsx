@@ -26,9 +26,9 @@ export default async function ItemsPage({ searchParams }: PageProps) {
   const page = parseInt(params.page || "1");
   const perPage = 20;
 
-  // Build where clause
   const where: Record<string, unknown> = {
     deletedAt: null,
+    status: "ACTIVE", // Only show active items in the public browse view
   };
 
   if (type === "LOST" || type === "FOUND") {
