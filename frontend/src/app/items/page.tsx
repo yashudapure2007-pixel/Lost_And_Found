@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { Search, SlidersHorizontal, Package } from "lucide-react";
+import { Search, Package } from "lucide-react";
 
 interface PageProps {
   searchParams: Promise<{

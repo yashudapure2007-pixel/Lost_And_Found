@@ -22,7 +22,6 @@ import {
   Tag,
   MessageSquare,
   Flag,
-  User,
   ImageOff,
   ArrowLeft,
 } from "lucide-react";
