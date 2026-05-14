@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { findMatches } from "./matching";
 
 const itemSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(120),
@@ -81,6 +82,9 @@ export async function createLostItem(formData: FormData) {
     },
   });
 
+  // Run auto-matching (don't await — runs in background)
+  findMatches(item.id).catch(console.error);
+
   revalidatePath("/items");
   revalidatePath("/dashboard");
   redirect(`/items/${item.id}`);
@@ -138,6 +142,9 @@ export async function createFoundItem(formData: FormData) {
       newValue: { title: item.title, type: "FOUND" },
     },
   });
+
+  // Run auto-matching
+  findMatches(item.id).catch(console.error);
 
   revalidatePath("/items");
   revalidatePath("/dashboard");

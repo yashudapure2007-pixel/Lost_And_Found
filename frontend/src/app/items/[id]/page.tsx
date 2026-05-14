@@ -238,7 +238,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                     </Link>
                   )}
                   <Link
-                    href={`/messages?item=${item.id}`}
+                    href={`/messages/redirect?item=${item.id}`}
                     className={cn(
                       buttonVariants({ variant: "outline", size: "lg" }),
                       "w-full h-11"
