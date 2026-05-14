@@ -96,7 +96,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   {/* Thumbnails */}
                   {item.images.length > 1 && (
                     <div className="grid grid-cols-3 gap-3">
-                      {item.images.slice(1).map((img) => (
+                      {item.images.slice(1).map((img: { id: string; imageUrl: string }) => (
                         <div
                           key={img.id}
                           className="relative aspect-square rounded-xl overflow-hidden bg-muted"
@@ -203,7 +203,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                     {item.user.name
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")
                       .toUpperCase()
                       .slice(0, 2)}
