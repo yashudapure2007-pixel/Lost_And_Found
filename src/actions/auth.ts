@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const onboardingSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -88,4 +89,67 @@ export async function getCurrentUser() {
   }
 
   return profile;
+}
+
+export async function updateUserProfile(formData: FormData) {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Not authenticated" };
+
+  const phone = formData.get("phone") as string;
+  const hostel = formData.get("hostel") as string;
+  const department = formData.get("department") as string;
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      phone: phone || null,
+      hostel: hostel || null,
+      department: department || null,
+    },
+  });
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+export async function deleteAccount() {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Not authenticated" };
+  if (user.role === "SUPER_ADMIN") return { error: "Super Admin cannot be deleted." };
+
+  // Hard delete all items reported by the user
+  await prisma.item.deleteMany({
+    where: { userId: user.id },
+  });
+
+  // Hard delete all claims made by the user
+  await prisma.claim.deleteMany({
+    where: { claimantId: user.id },
+  });
+
+  // Hard delete all messages sent by the user
+  await prisma.message.deleteMany({
+    where: { senderId: user.id },
+  });
+
+  // Hard delete all notifications for the user
+  await prisma.notification.deleteMany({
+    where: { userId: user.id },
+  });
+
+  // Anonymize the user record to preserve Audit Logs
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      name: "Deleted User",
+      email: `deleted_${user.id}@lostandfound.local`,
+      phone: null,
+      hostel: null,
+      department: null,
+      avatarUrl: null,
+      status: "DELETED",
+    },
+  });
+
+  return { success: true };
 }

@@ -1,5 +1,6 @@
-import { AlertTriangle } from "lucide-react";
-import { SignOutButton } from "@/components/sign-out-button";
+import { AlertTriangle, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { signOut } from "@/actions/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SuspendedPage() {
@@ -28,7 +29,12 @@ export default function SuspendedPage() {
             If you believe this is a mistake, please contact campus administration.
           </p>
           <div className="pt-4 flex justify-center border-t">
-            <SignOutButton />
+            <form action={signOut}>
+              <Button variant="outline">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </Button>
+            </form>
           </div>
         </CardContent>
       </Card>

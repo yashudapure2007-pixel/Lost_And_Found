@@ -133,7 +133,10 @@ export async function Navbar() {
                 <DropdownMenuItem render={<Link href="/messages" />}>
                   Messages
                 </DropdownMenuItem>
-                {user.role === "ADMIN" && (
+                <DropdownMenuItem render={<Link href="/dashboard/settings" />}>
+                  Settings
+                </DropdownMenuItem>
+                {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
                   <DropdownMenuItem render={<Link href="/admin" />}>
                     Admin Panel
                   </DropdownMenuItem>
@@ -190,6 +193,12 @@ export async function Navbar() {
                       className="px-4 py-3 text-sm font-medium rounded-lg transition-colors hover:bg-accent"
                     >
                       Messages
+                    </Link>
+                    <Link
+                      href="/dashboard/settings"
+                      className="px-4 py-3 text-sm font-medium rounded-lg transition-colors hover:bg-accent"
+                    >
+                      Settings
                     </Link>
                   </>
                 )}
