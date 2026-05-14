@@ -74,6 +74,7 @@ export async function getCurrentUser() {
 
   const profile = await prisma.user.findUnique({
     where: { authId: user.id },
+    include: { badges: true },
   });
 
   return profile;

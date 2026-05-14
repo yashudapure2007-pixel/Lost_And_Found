@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { findMatches } from "./matching";
+import { checkAndAwardBadges } from "./badges";
 
 const itemSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(120),
@@ -185,6 +186,10 @@ export async function updateItemStatus(itemId: string, status: "ACTIVE" | "RETUR
       newValue: { status },
     },
   });
+
+  if (status === "RETURNED") {
+    await checkAndAwardBadges(user.id);
+  }
 
   revalidatePath("/dashboard/reports");
   revalidatePath(`/items/${itemId}`);
