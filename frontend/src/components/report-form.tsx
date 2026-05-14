@@ -85,9 +85,13 @@ export function ReportForm({ type, categories, action }: ReportFormProps) {
             <Label>
               Category <span className="text-destructive">*</span>
             </Label>
-            <Select value={categoryId} onValueChange={handleCategoryChange}>
+            <Select value={categoryId || undefined} onValueChange={handleCategoryChange}>
               <SelectTrigger className="h-11">
-                <SelectValue placeholder="Select a category" />
+                <SelectValue placeholder="Select a category">
+                  {categoryId
+                    ? `${categories.find((c) => c.id === categoryId)?.icon ?? ""} ${categories.find((c) => c.id === categoryId)?.name ?? ""}`
+                    : undefined}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -214,7 +218,9 @@ export function ReportForm({ type, categories, action }: ReportFormProps) {
             <Label>Contact preference</Label>
             <Select value={contactPref} onValueChange={handleContactPrefChange}>
               <SelectTrigger className="h-11">
-                <SelectValue />
+                <SelectValue>
+                  {CONTACT_PREFERENCES.find((p) => p.value === contactPref)?.label ?? "In-app messaging only"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {CONTACT_PREFERENCES.map((pref) => (

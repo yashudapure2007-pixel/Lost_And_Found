@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search, Menu, MapPin } from "lucide-react";
+import { Search, Menu, MapPin, Bell } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getCurrentUser } from "@/actions/auth";
+import { getUnreadCount } from "@/actions/notifications";
 import { SignOutButton } from "./sign-out-button";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const navLinks = [
 
 export async function Navbar() {
   const user = await getCurrentUser();
+  const unreadCount = user ? await getUnreadCount() : 0;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -63,7 +65,21 @@ export async function Navbar() {
           </Link>
 
           {user ? (
-            <DropdownMenu>
+            <>
+              {/* Notification bell */}
+              <Link
+                href="/notifications"
+                className="relative h-9 w-9 flex items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground hover:bg-accent"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+
+              <DropdownMenu>
               <DropdownMenuTrigger
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
@@ -126,6 +142,7 @@ export async function Navbar() {
                 <SignOutButton />
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
           ) : (
             <Link
               href="/login"

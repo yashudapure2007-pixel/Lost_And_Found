@@ -24,6 +24,7 @@ import {
   Flag,
   ImageOff,
   ArrowLeft,
+  Phone,
 } from "lucide-react";
 
 interface PageProps {
@@ -52,6 +53,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           id: true,
           name: true,
           avatarUrl: true,
+          phone: true,
           createdAt: true,
         },
       },
@@ -221,6 +223,14 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   </p>
                 </div>
               </div>
+
+              {/* Contact info */}
+              {!isOwner && currentUser && (item.contactPreference === "phone" || item.contactPreference === "both") && item.user.phone && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                  <Phone className="h-4 w-4 text-emerald-600" />
+                  <span className="text-sm">{item.user.phone}</span>
+                </div>
+              )}
 
               {/* Action buttons */}
               {currentUser && !isOwner && item.status === "ACTIVE" && (
