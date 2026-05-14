@@ -10,6 +10,7 @@ import { AlertTriangle } from "lucide-react";
 export default async function ReportLostPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.status === "SUSPENDED") redirect("/suspended");
 
   const categories = await getCategories();
 

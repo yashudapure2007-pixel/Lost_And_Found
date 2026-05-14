@@ -12,6 +12,7 @@ import { MessageSquare } from "lucide-react";
 export default async function MessagesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.status === "SUSPENDED") redirect("/suspended");
 
   const conversations = await getUserConversations();
 

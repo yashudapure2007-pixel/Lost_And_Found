@@ -22,6 +22,10 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  if (user.status === "SUSPENDED") {
+    redirect("/suspended");
+  }
+
   if (!user.onboardingComplete) {
     redirect("/onboarding");
   }

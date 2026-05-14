@@ -4,9 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { BADGES } from "@/lib/constants";
 
 export async function checkAndAwardBadges(userId: string) {
-  // Get all user's items that are RETURNED
+  // Get user's items that are RETURNED and have a verified history (accepted match or approved claim)
   const returnedItemsCount = await prisma.item.count({
-    where: { userId, status: "RETURNED" },
+    where: { 
+      userId, 
+      status: "RETURNED",
+      OR: [
+        { claims: { some: { status: "APPROVED" } } },
+        { claims: { some: { status: "RETURNED" } } },
+        { foundMatches: { some: { status: "ACCEPTED" } } },
+        { lostMatches: { some: { status: "ACCEPTED" } } }
+      ]
+    },
   });
 
   // Get user's existing badges

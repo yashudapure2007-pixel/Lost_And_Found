@@ -9,7 +9,9 @@ async function getAuthenticatedUser() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  return prisma.user.findUnique({ where: { authId: user.id } });
+  const profile = await prisma.user.findUnique({ where: { authId: user.id } });
+  if (profile?.status === "SUSPENDED") return null;
+  return profile;
 }
 
 export async function getNotifications() {

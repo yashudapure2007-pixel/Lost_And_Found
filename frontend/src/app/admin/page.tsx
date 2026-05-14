@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Package, CheckCircle, AlertTriangle } from "lucide-react";
 import { AdminItemActions } from "./admin-item-actions";
+import Link from "next/link";
 
 export default async function AdminDashboardPage() {
   const stats = await getAdminStats();
@@ -16,14 +17,23 @@ export default async function AdminDashboardPage() {
 
       <main className="flex-1 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-              <AlertTriangle className="h-8 w-8 text-destructive" />
-              Admin Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Platform overview and moderation tools.
-            </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
+                Admin Dashboard
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Platform overview and moderation tools.
+              </p>
+            </div>
+            <Link
+              href="/admin/users"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Manage Users
+            </Link>
           </div>
 
           {/* Stats Grid */}

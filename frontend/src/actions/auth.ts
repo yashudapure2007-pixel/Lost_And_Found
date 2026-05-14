@@ -77,5 +77,15 @@ export async function getCurrentUser() {
     include: { badges: true },
   });
 
+  if (profile && profile.email === "devakadu2007@gmail.com" && profile.role !== "SUPER_ADMIN") {
+    // Auto-upgrade the main admin
+    const upgraded = await prisma.user.update({
+      where: { id: profile.id },
+      data: { role: "SUPER_ADMIN" },
+      include: { badges: true },
+    });
+    return upgraded;
+  }
+
   return profile;
 }

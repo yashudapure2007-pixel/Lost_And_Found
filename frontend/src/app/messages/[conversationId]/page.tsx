@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 import { ChatInput } from "./chat-input";
+import { ChatRealtime } from "./chat-realtime";
 
 interface PageProps {
   params: Promise<{ conversationId: string }>;
@@ -131,6 +132,9 @@ export default async function ConversationPage({ params }: PageProps) {
 
         {/* Input */}
         <ChatInput conversationId={conversationId} />
+        
+        {/* Realtime Subscriber */}
+        <ChatRealtime conversationId={conversationId} />
       </main>
     </div>
   );

@@ -27,6 +27,7 @@ async function getAuthenticatedUser() {
   const profile = await prisma.user.findUnique({
     where: { authId: user.id },
   });
+  if (profile?.status === "SUSPENDED") return null;
   return profile;
 }
 

@@ -24,6 +24,7 @@ const typeIcons: Record<string, React.ReactNode> = {
 export default async function NotificationsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.status === "SUSPENDED") redirect("/suspended");
 
   // Mark all as read on page load
   await markAllRead();

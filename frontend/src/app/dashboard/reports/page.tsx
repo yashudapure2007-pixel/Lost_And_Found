@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 export default async function UserReportsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.status === "SUSPENDED") redirect("/suspended");
 
   const items = await prisma.item.findMany({
     where: { userId: user.id, deletedAt: null },
