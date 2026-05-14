@@ -157,3 +157,36 @@ export async function getCategories() {
     orderBy: { sortOrder: "asc" },
   });
 }
+
+export async function updateItemStatus(itemId: string, status: "ACTIVE" | "RETURNED" | "CANCELLED") {
+  const user = await getAuthenticatedUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const item = await prisma.item.findUnique({
+    where: { id: itemId },
+    select: { userId: true },
+  });
+
+  if (!item || item.userId !== user.id) {
+    return { error: "Not found or unauthorized" };
+  }
+
+  await prisma.item.update({
+    where: { id: itemId },
+    data: { status },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "UPDATE_STATUS",
+      entityType: "Item",
+      entityId: itemId,
+      newValue: { status },
+    },
+  });
+
+  revalidatePath("/dashboard/reports");
+  revalidatePath(`/items/${itemId}`);
+  return { success: true };
+}
