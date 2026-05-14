@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum ItemType {
+  LOST
+  FOUND
+}
+
+enum ItemStatus {
+  ACTIVE
+  MATCHED
+  CLAIMED
+  UNDER_REVIEW
+  RETURNED
+  EXPIRED
+  CANCELLED
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  DISMISSED
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+  DISPUTED
+}
+
+enum ConversationStatus {
+  ACTIVE
+  CLOSED
+  REPORTED
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id                 String             @id @default(cuid())
+  authId             String             @unique @map("auth_id")
+  email              String             @unique
+  name               String
+  phone              String?
+  hostel             String?
+  department         String?
+  avatarUrl          String?            @map("avatar_url")
+  role               UserRole           @default(STUDENT)
+  status             UserStatus         @default(ACTIVE)
+  onboardingComplete Boolean            @default(false) @map("onboarding_complete")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+  deletedAt          DateTime?          @map("deleted_at")
+
+  // Relations
+  items              Item[]
+  claims             Claim[]
+  sentMessages       Message[]          @relation("SentMessages")
+  notifications      Notification[]
+  badges             UserBadge[]
+  auditLogs          AuditLog[]
+  conversations1     Conversation[]     @relation("Participant1")
+  conversations2     Conversation[]     @relation("Participant2")
+
+  @@map("users")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  icon      String?
+  isActive  Boolean  @default(true) @map("is_active")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  items     Item[]
+
+  @@map("categories")
+}
+
+model Item {
+  id                String     @id @default(cuid())
+  userId            String     @map("user_id")
+  type              ItemType
+  title             String
+  description       String
+  categoryId        String     @map("category_id")
+  dateOccurred      DateTime   @map("date_occurred")
+  timeOccurred      String?    @map("time_occurred")
+  locationText      String     @map("location_text")
+  holdingLocation   String?    @map("holding_location")
+  contactPreference String     @default("in_app") @map("contact_preference")
+  status            ItemStatus @default(ACTIVE)
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  deletedAt         DateTime?  @map("deleted_at")
+
+  // Relations
+  user              User       @relation(fields: [userId], references: [id])
+  category          Category   @relation(fields: [categoryId], references: [id])
+  images            ItemImage[]
+  lostMatches       Match[]    @relation("LostItem")
+  foundMatches      Match[]    @relation("FoundItem")
+  claims            Claim[]
+  conversation      Conversation?
+
+  @@index([type, status])
+  @@index([categoryId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("items")
+}
+
+model ItemImage {
+  id        String   @id @default(cuid())
+  itemId    String   @map("item_id")
+  imageUrl  String   @map("image_url")
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("item_images")
+}
+
+model Match {
+  id          String      @id @default(cuid())
+  lostItemId  String      @map("lost_item_id")
+  foundItemId String      @map("found_item_id")
+  score       Int
+  status      MatchStatus @default(PENDING)
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  lostItem    Item        @relation("LostItem", fields: [lostItemId], references: [id])
+  foundItem   Item        @relation("FoundItem", fields: [foundItemId], references: [id])
+
+  @@unique([lostItemId, foundItemId])
+  @@map("matches")
+}
+
+model Claim {
+  id              String      @id @default(cuid())
+  itemId          String      @map("item_id")
+  claimantId      String      @map("claimant_id")
+  proofText       String      @map("proof_text")
+  status          ClaimStatus @default(PENDING)
+  adminId         String?     @map("admin_id")
+  adminNotes      String?     @map("admin_notes")
+  rejectionReason String?     @map("rejection_reason")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  item            Item        @relation(fields: [itemId], references: [id])
+  claimant        User        @relation(fields: [claimantId], references: [id])
+  images          ClaimImage[]
+
+  @@map("claims")
+}
+
+model ClaimImage {
+  id        String   @id @default(cuid())
+  claimId   String   @map("claim_id")
+  imageUrl  String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  claim     Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@map("claim_images")
+}
+
+model Conversation {
+  id             String             @id @default(cuid())
+  itemId         String             @unique @map("item_id")
+  participant1Id String             @map("participant_1_id")
+  participant2Id String             @map("participant_2_id")
+  status         ConversationStatus @default(ACTIVE)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  closedAt       DateTime?          @map("closed_at")
+
+  // Relations
+  item           Item               @relation(fields: [itemId], references: [id])
+  participant1   User               @relation("Participant1", fields: [participant1Id], references: [id])
+  participant2   User               @relation("Participant2", fields: [participant2Id], references: [id])
+  messages       Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String       @map("conversation_id")
+  senderId       String       @map("sender_id")
+  content        String
+  imageUrl       String?      @map("image_url")
+  isRead         Boolean      @default(false) @map("is_read")
+  readAt         DateTime?    @map("read_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  type          String
+  title         String
+  body          String
+  referenceType String?  @map("reference_type")
+  referenceId   String?  @map("reference_id")
+  isRead        Boolean  @default(false) @map("is_read")
+  readAt        DateTime? @map("read_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  badgeType String   @map("badge_type")
+  earnedAt  DateTime @default(now()) @map("earned_at")
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, badgeType])
+  @@map("user_badges")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  oldValue   Json?    @map("old_value")
+  newValue   Json?    @map("new_value")
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
