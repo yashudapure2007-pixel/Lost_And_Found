@@ -34,12 +34,12 @@ export default async function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <main className="flex-1 bg-muted/30 w-full min-w-0">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 w-full min-w-0 break-words">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 min-w-0">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight truncate break-words whitespace-normal">
                 Welcome back, {user.name.split(" ")[0]}! 👋
               </h1>
               <p className="text-muted-foreground mt-1">

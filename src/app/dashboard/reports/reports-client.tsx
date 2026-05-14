@@ -79,7 +79,15 @@ export function ReportsClient({ items }: ReportsClientProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 w-full min-w-0 break-words">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 min-w-0">
+        <div className="min-w-0">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground truncate break-words whitespace-normal">My Reports</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+            Manage your lost and found reports.
+          </p>
+        </div>
+      </div>
       {optimisticItems.map((item) => (
         <Card key={item.id} className="overflow-hidden">
           <div className="flex flex-col sm:flex-row">

@@ -170,12 +170,13 @@ export async function deleteAccount() {
     where: { userId: user.id },
   });
 
-  // Anonymize the user record to preserve Audit Logs
+  // Finally, scramble the user profile to anonymize it but keep audit logs intact
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      name: "Deleted User",
+      authId: `deleted_${user.id}_${Date.now()}`,
       email: `deleted_${user.id}@lostandfound.local`,
+      name: "Deleted User",
       phone: null,
       hostel: null,
       department: null,

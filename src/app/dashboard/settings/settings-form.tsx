@@ -60,14 +60,14 @@ export function SettingsForm({ user }: SettingsFormProps) {
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader>
+        <CardHeader className="break-words">
           <CardTitle>Profile Information</CardTitle>
           <CardDescription>
             Update your contact details and academic information.
           </CardDescription>
         </CardHeader>
         <form key={`${user.phone}-${user.hostel}-${user.department}`} onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 break-words min-w-0">
             <div className="space-y-2">
               <Label htmlFor="phone">Mobile Number</Label>
               <Input
